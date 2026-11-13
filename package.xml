@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<package format="3">
+
+  <name>whill_gazebo</name>
+  <version>0.0.1</version>
+  <description>Gazebo simulation models and worlds for WHILL experiments.</description>
+  <maintainer email="user@example.com">maintainer</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+
+  <exec_depend>ros_gz_bridge</exec_depend>
+
+  <exec_depend>whill_trajectory_control</exec_depend>
+  <exec_depend>whill_exact_replay</exec_depend>
+  <exec_depend>whill_experiment_recorder</exec_depend>
+
+</package>

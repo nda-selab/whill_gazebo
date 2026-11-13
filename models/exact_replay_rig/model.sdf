@@ -1,0 +1,218 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.8">
+
+  <model name="exact_replay_rig">
+
+    <!-- ====================================================== -->
+    <!-- Kinematic base                                         -->
+    <!-- ====================================================== -->
+
+    <link name="base_link">
+
+      <kinematic>true</kinematic>
+
+      <gravity>false</gravity>
+
+      <inertial>
+        <mass>1.0</mass>
+      </inertial>
+
+      <!--
+        collisionなし。
+        Exact Replayでは床や障害物から
+        物理的な力を受けない。
+      -->
+
+      <visual name="visual">
+
+        <geometry>
+          <box>
+            <size>0.30 0.20 0.08</size>
+          </box>
+        </geometry>
+
+        <material>
+          <ambient>1.0 0.8 0.0 0.6</ambient>
+          <diffuse>1.0 0.8 0.0 0.6</diffuse>
+        </material>
+
+      </visual>
+
+    </link>
+
+
+    <!-- ====================================================== -->
+    <!-- Sensor link                                            -->
+    <!-- ====================================================== -->
+
+    <link name="sensor_link">
+
+      <!--
+        Physical robotと同じsensor_link位置
+      -->
+      <pose relative_to="base_link">0 0 0.20 0 0 0</pose>
+
+      <gravity>false</gravity>
+
+      <inertial>
+        <mass>0.1</mass>
+      </inertial>
+
+
+      <!-- ==================================================== -->
+      <!-- Exact reverse IMU                                    -->
+      <!-- ==================================================== -->
+
+      <sensor
+        name="exact_imu_sensor"
+        type="imu">
+
+        <always_on>true</always_on>
+
+        <update_rate>200</update_rate>
+
+        <topic>/exact/imu</topic>
+
+      </sensor>
+
+
+      <!-- ==================================================== -->
+      <!-- Exact reverse LiDAR                                  -->
+      <!-- ==================================================== -->
+
+      <sensor
+        name="exact_lidar_sensor"
+        type="gpu_lidar">
+
+        <!--
+          Physical robotと同じLiDAR extrinsic
+        -->
+        <pose>0 0 0.08 0 0 0</pose>
+
+        <topic>/exact/lidar</topic>
+
+        <update_rate>10</update_rate>
+
+        <ray>
+
+          <scan>
+
+            <horizontal>
+
+              <samples>512</samples>
+
+              <resolution>1</resolution>
+
+              <min_angle>-3.14159265</min_angle>
+
+              <max_angle>3.14159265</max_angle>
+
+            </horizontal>
+
+
+            <vertical>
+
+              <samples>64</samples>
+
+              <resolution>1</resolution>
+
+              <min_angle>-0.19635</min_angle>
+
+              <max_angle>0.19635</max_angle>
+
+            </vertical>
+
+          </scan>
+
+
+          <range>
+
+            <min>0.3</min>
+
+            <max>50.0</max>
+
+            <resolution>0.01</resolution>
+
+          </range>
+
+        </ray>
+
+        <always_on>true</always_on>
+
+        <visualize>true</visualize>
+
+      </sensor>
+
+    </link>
+
+
+    <joint
+      name="sensor_joint"
+      type="fixed">
+
+      <parent>base_link</parent>
+
+      <child>sensor_link</child>
+
+    </joint>
+
+
+    <!-- ====================================================== -->
+    <!-- Exact replay system plugin                             -->
+    <!-- ====================================================== -->
+
+    <plugin
+      filename="libwhill_exact_replay.so"
+      name="whill_exact_replay::ExactReplay">
+
+      <source_model>
+        four_wheel_robot
+      </source_model>
+
+      <source_link>
+        base_link
+      </source_link>
+
+      <target_link>
+        base_link
+      </target_link>
+
+      <csv_path>
+        /tmp/forward_exact.csv
+      </csv_path>
+
+    </plugin>
+
+
+    <!-- ====================================================== -->
+    <!-- Replay ground truth                                    -->
+    <!-- ====================================================== -->
+
+    <plugin
+      filename="libignition-gazebo-pose-publisher-system.so"
+      name="ignition::gazebo::systems::PosePublisher">
+
+      <publish_link_pose>false</publish_link_pose>
+
+      <publish_visual_pose>false</publish_visual_pose>
+
+      <publish_collision_pose>false</publish_collision_pose>
+
+      <publish_sensor_pose>false</publish_sensor_pose>
+
+      <publish_model_pose>true</publish_model_pose>
+
+      <publish_nested_model_pose>true</publish_nested_model_pose>
+
+      <use_pose_vector_msg>true</use_pose_vector_msg>
+
+      <static_publisher>false</static_publisher>
+
+      <update_frequency>50</update_frequency>
+
+    </plugin>
+
+  </model>
+
+</sdf>

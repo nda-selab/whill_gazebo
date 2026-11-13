@@ -1,0 +1,216 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+
+  <world name="whill_test_world">
+
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <plugin
+      filename="libignition-gazebo-physics-system.so"
+      name="ignition::gazebo::systems::Physics"/>
+
+    <plugin
+      filename="libignition-gazebo-user-commands-system.so"
+      name="ignition::gazebo::systems::UserCommands"/>
+
+    <plugin
+      filename="libignition-gazebo-scene-broadcaster-system.so"
+      name="ignition::gazebo::systems::SceneBroadcaster"/>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="ground">
+      <static>true</static>
+      <link name="ground_link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>20 20 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>20 20 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+
+        <pose>0 0 -0.05 0 0 0</pose>
+      </link>
+    </model>
+
+    <model name="simple_robot">
+      <pose>0 0 0.15 0 0 0</pose>
+
+      <link name="chassis">
+        <inertial>
+          <mass>20.0</mass>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.50 0.35 0.12</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.50 0.35 0.12</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name="left_wheel">
+        <pose relative_to="chassis">0 0.20 -0.05 -1.5708 0 0</pose>
+
+        <inertial>
+          <mass>1.0</mass>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.10</radius>
+              <length>0.04</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.10</radius>
+              <length>0.04</length>
+            </cylinder>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name="right_wheel">
+        <pose relative_to="chassis">0 -0.20 -0.05 -1.5708 0 0</pose>
+
+        <inertial>
+          <mass>1.0</mass>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.10</radius>
+              <length>0.04</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.10</radius>
+              <length>0.04</length>
+            </cylinder>
+          </geometry>
+        </visual>
+      </link>
+
+      <frame name="caster_frame" attached_to="chassis">
+        <pose>0.20 0 -0.10 0 0 0</pose>
+      </frame>
+
+      <link name="caster">
+        <pose relative_to="caster_frame"/>
+
+        <inertial>
+          <mass>0.5</mass>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.05</radius>
+            </sphere>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.05</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+
+      <joint name="left_wheel_joint" type="revolute">
+        <pose relative_to="left_wheel"/>
+        <parent>chassis</parent>
+        <child>left_wheel</child>
+
+        <axis>
+          <xyz expressed_in="__model__">0 1 0</xyz>
+          <limit>
+            <lower>-1.79769e+308</lower>
+            <upper>1.79769e+308</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="right_wheel_joint" type="revolute">
+        <pose relative_to="right_wheel"/>
+        <parent>chassis</parent>
+        <child>right_wheel</child>
+
+        <axis>
+          <xyz expressed_in="__model__">0 1 0</xyz>
+          <limit>
+            <lower>-1.79769e+308</lower>
+            <upper>1.79769e+308</upper>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name="caster_joint" type="ball">
+        <parent>chassis</parent>
+        <child>caster</child>
+      </joint>
+
+      <plugin
+        filename="libignition-gazebo-diff-drive-system.so"
+        name="ignition::gazebo::systems::DiffDrive">
+
+        <left_joint>left_wheel_joint</left_joint>
+        <right_joint>right_wheel_joint</right_joint>
+
+        <wheel_separation>0.40</wheel_separation>
+        <wheel_radius>0.10</wheel_radius>
+
+        <topic>cmd_vel</topic>
+
+        <odom_topic>odom</odom_topic>
+        <frame_id>odom</frame_id>
+        <child_frame_id>base_link</child_frame_id>
+
+        <odom_publish_frequency>50</odom_publish_frequency>
+
+      </plugin>
+
+    </model>
+
+  </world>
+
+</sdf>

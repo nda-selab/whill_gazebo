@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+
+# ROS 2 / colcon
+build/
+install/
+log/
+
+# Experimental data
+*.bag
+*.db3
+*.mcap
+experiment_data/
+
+# Temporary files
+*.tmp
+*.log
+
+# Editor
+.vscode/
+.idea/
